@@ -46,21 +46,23 @@ export function AppSidebar() {
           </div>
         </div>
 
-        {/* Main Navigation Tabs */}
-        <div className="p-4 space-y-2">
-          {mainTabs.map((tab) => (
-            <Button
-              key={tab.title}
-              asChild
-              variant={isActive(tab.url) ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <NavLink to={tab.url} end>
-                <tab.icon className="w-4 h-4" />
-                {!collapsed && <span className="ml-2">{tab.title}</span>}
-              </NavLink>
-            </Button>
-          ))}
+        {/* Main Navigation Tabs - Horizontal Layout */}
+        <div className="p-4">
+          <div className="flex gap-2">
+            {mainTabs.map((tab) => (
+              <Button
+                key={tab.title}
+                asChild
+                variant={isActive(tab.url) ? "default" : "ghost"}
+                className="flex-1 justify-center"
+              >
+                <NavLink to={tab.url} end>
+                  <tab.icon className="w-4 h-4" />
+                  {!collapsed && <span className="ml-2">{tab.title}</span>}
+                </NavLink>
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Search Bar */}
