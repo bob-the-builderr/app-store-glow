@@ -46,21 +46,25 @@ export function AppSidebar() {
           </div>
         </div>
 
-        {/* Main Navigation Tabs - Horizontal Layout */}
+        {/* Main Navigation Toggle - Modern Segmented Control */}
         <div className="p-4">
-          <div className="flex gap-2">
+          <div className="bg-muted rounded-full p-1 flex">
             {mainTabs.map((tab) => (
-              <Button
+              <NavLink
                 key={tab.title}
-                asChild
-                variant={isActive(tab.url) ? "default" : "ghost"}
-                className="flex-1 justify-center"
+                to={tab.url}
+                end
+                className={({ isActive }) =>
+                  `flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`
+                }
               >
-                <NavLink to={tab.url} end>
-                  <tab.icon className="w-4 h-4" />
-                  {!collapsed && <span className="ml-2">{tab.title}</span>}
-                </NavLink>
-              </Button>
+                <tab.icon className="w-4 h-4" />
+                {!collapsed && <span>{tab.title}</span>}
+              </NavLink>
             ))}
           </div>
         </div>
