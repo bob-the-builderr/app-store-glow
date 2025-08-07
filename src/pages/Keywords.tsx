@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Lightbulb, Smartphone, X, RefreshCw, MoreHorizontal, ArrowUp01, ArrowDown01, TrendingUp } from "lucide-react";
+import { Plus, Search, Lightbulb, Smartphone, X, RefreshCw, MoreHorizontal, ArrowUpDown, TrendingUp } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -550,7 +550,7 @@ export default function Keywords() {
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
                 onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
               >
-                {sortOrder === "asc" ? <ArrowUp01 className="w-3 h-3" /> : <ArrowDown01 className="w-3 h-3" />}
+                <ArrowUpDown className="w-3 h-3" />
               </Button>
             </div>
             <div className="relative">
