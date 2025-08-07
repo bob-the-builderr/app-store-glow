@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useAppContext } from "@/contexts/AppContext";
 
 import {
   Sidebar,
@@ -17,37 +18,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-const mockUserApps = [
-  { 
-    id: "1", 
-    name: "FitTracker Pro", 
-    icon: "/placeholder.svg",
-    status: "active",
-    lastUpdated: "2 hours ago"
-  },
-  { 
-    id: "2", 
-    name: "PhotoEdit Master", 
-    icon: "/placeholder.svg",
-    status: "active",
-    lastUpdated: "1 day ago"
-  },
-  { 
-    id: "3", 
-    name: "TaskManager Plus", 
-    icon: "/placeholder.svg",
-    status: "inactive",
-    lastUpdated: "3 days ago"
-  },
-  { 
-    id: "4", 
-    name: "Music Streamer", 
-    icon: "/placeholder.svg",
-    status: "active",
-    lastUpdated: "5 hours ago"
-  },
-];
 
 const regions = [
   { value: "us", label: "United States", code: "US" },
@@ -86,7 +56,9 @@ export function AppSidebar() {
   const [isSearching, setIsSearching] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const filteredApps = mockUserApps.filter(app => 
+  const { userApps, selectedApp, setSelectedApp, addUserApp } = useAppContext();
+
+  const filteredApps = userApps.filter(app => 
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -133,6 +105,19 @@ export function AppSidebar() {
         // Access response.data as shown in the code snippet
         const apps = data.data || data || [];
         console.log("Apps array:", apps);
+        
+        // Log the first app to see its structure
+        if (apps.length > 0) {
+          console.log("First app structure:", apps[0]);
+          console.log("Available fields:", Object.keys(apps[0]));
+          console.log("Package field value:", apps[0].package);
+          console.log("Package field type:", typeof apps[0].package);
+          // Log all fields and their values
+          Object.entries(apps[0]).forEach(([key, value]) => {
+            console.log(`${key}:`, value, `(type: ${typeof value})`);
+          });
+        }
+        
         setSearchResults(Array.isArray(apps) ? apps : []);
       } else {
         console.error("Search failed:", response.status);
@@ -169,8 +154,27 @@ export function AppSidebar() {
   };
 
   const handleAppSelect = (app: SearchResult) => {
-    setNewAppName(app.title);
+    // Add the selected app to user's apps
+    const newApp = {
+      id: app.package,
+      name: app.title,
+      icon: app.icon,
+      status: "active" as const,
+      lastUpdated: "Just added",
+      package: app.package,
+      developer: app.developer,
+      country: selectedRegionData?.code || "US"
+    };
+    
+    addUserApp(newApp);
+    setSelectedApp(newApp);
+    setNewAppName("");
     setSearchResults([]);
+    setIsAddAppOpen(false);
+  };
+
+  const handleAppClick = (app: any) => {
+    setSelectedApp(app);
   };
 
   useEffect(() => {
@@ -242,6 +246,7 @@ export function AppSidebar() {
               <Button 
                 className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm rounded-full"
                 onClick={() => setIsAddAppOpen(true)}
+                data-add-app-button
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add New App
@@ -257,6 +262,7 @@ export function AppSidebar() {
                 size="sm" 
                 className="w-full h-10"
                 onClick={() => setIsAddAppOpen(true)}
+                data-add-app-button
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -285,9 +291,23 @@ export function AppSidebar() {
                   key={app.id}
                   className="group"
                 >
-                  <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                  <div 
+                    className={`flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${
+                      selectedApp?.id === app.id ? 'bg-primary/10 border border-primary/20' : ''
+                    }`}
+                    onClick={() => handleAppClick(app)}
+                  >
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
-                      {app.name.charAt(0)}
+                      {app.icon ? (
+                        <img
+                          src={app.icon}
+                          alt={app.name}
+                          className="w-8 h-8 rounded-lg object-cover"
+                          onError={e => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
+                        />
+                      ) : (
+                        app.name.charAt(0)
+                      )}
                     </div>
                     
                     {!collapsed && (
