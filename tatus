@@ -1,0 +1,12 @@
+*   [33m2d0690f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/bob-the-builderr/app-store-glow
+[31m|[m[32m\[m  
+[31m|[m * [33m8dc7558[m Reverted to commit a6e06877fd2649dedd7239796a0ab50d49382a0d
+[31m|[m * [33m6541462[m Update icon to ascending/descending
+* [32m|[m [33m6e04934[m UI improvements: rounded corners consistency and multi-keyword search support
+[32m|[m[32m/[m  
+* [33ma6e0687[m Add ranking filter and sort functionality to Keywords page - Added new ranking button with TrendingUp icon - Added rank filter dropdown with Top 10, 25, 50, 100 options - Added rank sorting functionality (ascending/descending) - Integrated with existing score filtering and sorting
+* [33m36d742d[m Update app structure and styling - modified App.tsx, AppSidebar.tsx, Layout.tsx, Keywords.tsx, index.css, tailwind.config.ts and removed unused pages
+* [33maaae3fb[m Refactor sidebar design
+* [33m8d200d6[m Update sidebar layout
+* [33m1fd46a1[m Update sidebar layout
+* [33m387ffb3[m Change background to white
