@@ -6,6 +6,8 @@ import { ThemeProvider } from "next-themes";
 import Keywords from "./pages/Keywords";
 import Layout from "./components/Layout";
 import { AppProvider } from "./contexts/AppContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -18,15 +20,19 @@ const App = () => (
       disableTransitionOnChange
       storageKey="app-theme"
     >
-      <AppProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Layout>
-            <Keywords />
-          </Layout>
-        </TooltipProvider>
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <ProtectedRoute>
+              <Layout>
+                <Keywords />
+              </Layout>
+            </ProtectedRoute>
+          </TooltipProvider>
+        </AppProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
