@@ -201,11 +201,22 @@ export default function Keywords() {
       return;
     }
 
+    // Split keywords by comma and clean them up
+    const keywords = keywordInput
+      .split(',')
+      .map(k => k.trim())
+      .filter(k => k.length > 0);
+
+    if (keywords.length === 0) {
+      console.log("No valid keywords found");
+      return;
+    }
+
     setIsLoading(true);
     
     const maxRetries = 3;
     let retryCount = 0;
-    let keywordData = null;
+    let allKeywordData: KeywordData[] = [];
 
     while (retryCount < maxRetries) {
       try {
@@ -213,7 +224,7 @@ export default function Keywords() {
           appstore: 2,
           package: selectedApp.package,
           country: selectedRegion.toUpperCase(),
-          keywords: [keywordInput.trim()]
+          keywords: keywords
         });
 
         const response = await fetch("https://new.keyapp.top/api/public/v2/keywords", {
@@ -226,7 +237,7 @@ export default function Keywords() {
             appstore: 2,
             package: selectedApp.package,
             country: selectedRegion.toUpperCase(),
-            keywords: [keywordInput.trim()]
+            keywords: keywords
           })
         });
 
@@ -242,21 +253,25 @@ export default function Keywords() {
           console.log("Data.data length:", Array.isArray(data.data) ? data.data.length : 'not an array');
           
           if (data.data && data.data.length > 0) {
-            keywordData = data.data[0];
+            allKeywordData = data.data;
             
-            // Check if score or rank is null
-            if (keywordData.score === null || keywordData.rank === null) {
-              console.log(`Attempt ${retryCount + 1}: Score or rank is null, retrying...`);
+            // Check if any keywords have null scores or ranks
+            const hasNullValues = allKeywordData.some(keyword => 
+              keyword.score === null || keyword.rank === null
+            );
+            
+            if (hasNullValues) {
+              console.log(`Attempt ${retryCount + 1}: Some keywords have null values, retrying...`);
               retryCount++;
               if (retryCount < maxRetries) {
                 // Wait a bit before retrying
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 continue;
               } else {
-                console.log("Max retries reached, adding keyword with null values");
+                console.log("Max retries reached, adding keywords with null values");
               }
             } else {
-              console.log("Valid response received, adding keyword");
+              console.log("Valid response received, adding keywords");
               break;
             }
           }
@@ -276,13 +291,13 @@ export default function Keywords() {
       }
     }
 
-    // Add keyword to table if we have data (even with null values after max retries)
-    if (keywordData) {
+    // Add all keywords to table if we have data (even with null values after max retries)
+    if (allKeywordData.length > 0) {
       setStoredKeywords(prev => ({
         ...prev,
         [selectedApp?.id]: {
           ...prev[selectedApp?.id],
-          [selectedRegion]: [...(prev[selectedApp?.id]?.[selectedRegion] || []), keywordData]
+          [selectedRegion]: [...(prev[selectedApp?.id]?.[selectedRegion] || []), ...allKeywordData]
         }
       }));
       setIsAddKeywordOpen(false);
@@ -485,10 +500,15 @@ export default function Keywords() {
   return (
     <div className="space-y-6">
       {selectedApp ? (
-        // Remove the app header bar, keep only the controls and table
+        // App selected - show keyword management interface
         <>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Keyword Rankings</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Keyword Rankings</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Track and optimize keywords for {selectedApp.name}
+              </p>
+            </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" size="default" className="rounded-full">
                 <Lightbulb className="w-4 h-4 mr-2" />
@@ -628,7 +648,7 @@ export default function Keywords() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      {selectedApp ? `No keywords added for ${selectedRegion.toUpperCase()} yet. Use the 'Add Keyword' button to search and add keywords for this region.` : "Select an app to view keywords"}
+                      No keywords added for {selectedRegion.toUpperCase()} yet. Use the 'Add Keyword' button to search and add keywords for this region.
                     </TableCell>
                   </TableRow>
                 )}
@@ -637,56 +657,42 @@ export default function Keywords() {
           </div>
         </>
       ) : (
-        // Show default header when no app is selected
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Track and optimize your keyword rankings</h1>
-            <p className="text-muted-foreground mt-1">Select an app from the sidebar to view its keywords</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="default" className="rounded-full">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              Find Suggestions
-            </Button>
-            <Button size="default" className="bg-primary hover:bg-primary/90 rounded-full" onClick={() => setIsAddKeywordOpen(true)}>
+        // Simple empty state when no app is selected
+        <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+          <div className="text-center">
+            <Smartphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No App Selected</h3>
+            <p className="text-muted-foreground mb-4">
+              Select an app from the sidebar to view its keyword rankings and analytics.
+            </p>
+            <Button 
+              className="w-52 h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm rounded-full"
+              onClick={() => (document.querySelector('[data-add-app-button]') as HTMLElement | null)?.click()}
+            >
               <Plus className="w-4 h-4 mr-2" />
-              Add Keyword
+              Add New App
             </Button>
           </div>
-        </div>
-      )}
-
-      {!selectedApp && (
-        <div className="text-center py-12">
-          <Smartphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No App Selected</h3>
-          <p className="text-muted-foreground mb-4">
-            Select an app from the sidebar to view its keyword rankings and analytics.
-          </p>
-          <Button onClick={() => (document.querySelector('[data-add-app-button]') as HTMLElement | null)?.click()}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Your First App
-          </Button>
         </div>
       )}
 
       {/* Add Keyword Modal */}
       <Dialog open={isAddKeywordOpen} onOpenChange={setIsAddKeywordOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg rounded-xl [&>button]:hidden">
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Search for keyword</label>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Enter keyword to search..."
+                  placeholder="You can add multiple keywords separated by comma"
                   value={keywordInput}
                   onChange={(e) => setKeywordInput(e.target.value)}
                   onKeyPress={handleKeywordKeyPress}
-                  className="flex-1"
+                  className="flex-1 rounded-xl"
                 />
                 <Button 
                   onClick={handleKeywordSearch}
                   disabled={isLoading || !selectedApp?.package || !selectedRegion || !keywordInput.trim()}
+                  className="rounded-xl"
                 >
                   {isLoading ? "Searching..." : "Add"}
                 </Button>

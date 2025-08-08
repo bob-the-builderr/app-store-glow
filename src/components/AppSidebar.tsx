@@ -215,7 +215,7 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible="icon">
-        <SidebarContent className="flex flex-col h-full bg-gradient-to-b from-background to-muted/20">
+        <SidebarContent className="flex flex-col h-full bg-background">
           {/* Header */}
           <div className="p-6 pb-4">
             <div className="flex items-center gap-3">
@@ -344,22 +344,24 @@ export function AppSidebar() {
 
       {/* Add App Modal */}
       <Dialog open={isAddAppOpen} onOpenChange={setIsAddAppOpen}>
-        <DialogContent className="sm:max-w-2xl border-0 shadow-none bg-transparent">
-          <div className="bg-background rounded-2xl border border-border/50 shadow-xl p-6">
+        <DialogContent className="sm:max-w-2xl border-0 shadow-none bg-transparent rounded-xl">
+          <div className="bg-background rounded-xl border border-border/50 shadow-xl p-6">
             <div className="space-y-4">
               <div className="space-y-3">
                 <div className="flex gap-3">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
                     <Input
                       placeholder="Search App Store..."
                       value={newAppName}
                       onChange={(e) => setNewAppName(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      className="pl-10 h-9 rounded-xl border-border/50 focus:border-primary/50 focus:ring-0 focus:ring-offset-0"
+                      className={`pl-10 h-9 rounded-xl border-border/50 focus:border-primary/50 focus:ring-0 focus:ring-offset-0 ${isSearching ? 'pr-10' : ''}`}
                     />
                     {isSearching && (
-                      <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 animate-spin" />
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10">
+                        <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    </div>
                     )}
                   </div>
                   <Select value={selectedRegion} onValueChange={setSelectedRegion}>
@@ -376,6 +378,13 @@ export function AppSidebar() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <Button 
+                    onClick={handleSearch}
+                    disabled={isSearching || !newAppName.trim() || newAppName.length < 2}
+                    className="h-9 rounded-xl"
+                  >
+                    {isSearching ? "Searching..." : "Search"}
+                  </Button>
                 </div>
 
                 {/* Search Results Container */}
