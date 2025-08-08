@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useAppContext } from "@/contexts/AppContext";
+import { useNavigate } from "react-router-dom";
 
 import {
   Sidebar,
@@ -57,6 +58,15 @@ export function AppSidebar() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { userApps, selectedApp, setSelectedApp, addUserApp } = useAppContext();
+  const navigate = useNavigate();
+
+  // Reset search query when component mounts
+  useEffect(() => {
+    setSearchQuery("");
+    setNewAppName("");
+    setSearchResults([]);
+    setIsSearching(false);
+  }, []);
 
   const filteredApps = userApps.filter(app => 
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -175,6 +185,10 @@ export function AppSidebar() {
 
   const handleAppClick = (app: any) => {
     setSelectedApp(app);
+    // Navigate back to main page if we're on settings page
+    if (window.location.pathname === '/settings') {
+      navigate('/');
+    }
   };
 
   useEffect(() => {
@@ -214,17 +228,27 @@ export function AppSidebar() {
 
   return (
     <>
+      {/* Hidden dummy form to prevent autocomplete */}
+      <form style={{ display: 'none' }}>
+        <input type="text" name="fakeusernameremembered" />
+        <input type="password" name="fakepasswordremembered" />
+      </form>
+      
       <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible="icon">
         <SidebarContent className="flex flex-col h-full bg-background">
           {/* Header */}
           <div className="p-6 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center shadow-lg">
-                <TrendingUp className="w-5 h-5 text-primary-foreground" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                <img 
+                  src="/ASOLYT (4).png" 
+                  alt="ASOLYT Logo" 
+                  className="w-8 h-8"
+                />
               </div>
               {!collapsed && (
                 <div>
-                  <h1 className="font-bold text-lg text-foreground">ASO Optimizer</h1>
+                  <h1 className="font-bold text-lg text-foreground">ASOLYT</h1>
                   <p className="text-xs text-muted-foreground font-medium">App Store Analytics</p>
                 </div>
               )}
@@ -241,6 +265,10 @@ export function AppSidebar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 h-10 bg-background/50 border-border/50 focus:border-primary/50 rounded-full"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
                 />
               </div>
               <Button 
@@ -334,6 +362,7 @@ export function AppSidebar() {
             <Button
               variant="ghost"
               className="w-full justify-start h-9 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/settings')}
             >
               <Settings className="w-4 h-4 mr-3" />
               {!collapsed && <span className="font-medium">Settings</span>}
@@ -344,84 +373,61 @@ export function AppSidebar() {
 
       {/* Add App Modal */}
       <Dialog open={isAddAppOpen} onOpenChange={setIsAddAppOpen}>
-        <DialogContent className="sm:max-w-2xl border-0 shadow-none bg-transparent rounded-xl">
-          <div className="bg-background rounded-xl border border-border/50 shadow-xl p-6">
-            <div className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-                    <Input
-                      placeholder="Search App Store..."
-                      value={newAppName}
-                      onChange={(e) => setNewAppName(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      className={`pl-10 h-9 rounded-xl border-border/50 focus:border-primary/50 focus:ring-0 focus:ring-offset-0 ${isSearching ? 'pr-10' : ''}`}
-                    />
-                    {isSearching && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10">
-                        <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                    </div>
-                    )}
-                  </div>
-                  <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                    <SelectTrigger className="w-28 h-9 rounded-xl border-border/50 focus:border-primary/50">
-                      <SelectValue>
-                        {selectedRegionData ? selectedRegionData.code : "Region"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      {regions.map((region) => (
-                        <SelectItem key={region.value} value={region.value}>
-                          {region.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button 
-                    onClick={handleSearch}
-                    disabled={isSearching || !newAppName.trim() || newAppName.length < 2}
-                    className="h-9 rounded-xl"
-                  >
-                    {isSearching ? "Searching..." : "Search"}
-                  </Button>
-                </div>
-
-                {/* Search Results Container */}
-                <div id="resultsContainer">
-                  {searchResults.length > 0 && (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      <div className="text-xs text-muted-foreground mb-2">
-                        Found {searchResults.length} results
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New App</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="app-name">App Name</Label>
+              <Input
+                id="app-name"
+                placeholder="Enter app name"
+                value={newAppName}
+                onChange={(e) => setNewAppName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-region">Region</Label>
+              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select region" />
+                </SelectTrigger>
+                <SelectContent>
+                  {regions.map((region) => (
+                    <SelectItem key={region.value} value={region.value}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{region.code}</span>
+                        <span className="text-xs text-muted-foreground">{region.label}</span>
                       </div>
-                      {searchResults.map((app, index) => (
-                        <div
-                          key={app.package}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border/30"
-                          onClick={() => handleAppSelect(app)}
-                        >
-                          <img 
-                            src={app.icon} 
-                            alt={app.title}
-                            className="w-10 h-10 rounded-lg object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = "/placeholder.svg";
-                            }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm text-foreground truncate">{app.title}</h3>
-                            <p className="text-xs text-muted-foreground">{app.developer}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddAppOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddApp}
+              disabled={!newAppName.trim() || isSearching}
+            >
+              {isSearching ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                'Add App'
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+
     </>
   );
 }

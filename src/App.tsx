@@ -3,7 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Keywords from "./pages/Keywords";
+import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import { AppProvider } from "./contexts/AppContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -26,9 +28,14 @@ const App = () => (
             <Toaster />
             <Sonner />
             <ProtectedRoute>
-              <Layout>
-                <Keywords />
-              </Layout>
+              <Router>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Keywords />} />
+                    <Route path="/settings" element={<Settings />} />
+                  </Routes>
+                </Layout>
+              </Router>
             </ProtectedRoute>
           </TooltipProvider>
         </AppProvider>
