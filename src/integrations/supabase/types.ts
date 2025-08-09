@@ -14,8 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_analytics: {
+        Row: {
+          active_users: number | null
+          app_id: string
+          crash_rate: number | null
+          created_at: string
+          date: string
+          downloads: number | null
+          id: string
+          rating_average: number | null
+          retention_rate: number | null
+          revenue: number | null
+          reviews_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_users?: number | null
+          app_id: string
+          crash_rate?: number | null
+          created_at?: string
+          date: string
+          downloads?: number | null
+          id?: string
+          rating_average?: number | null
+          retention_rate?: number | null
+          revenue?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_users?: number | null
+          app_id?: string
+          crash_rate?: number | null
+          created_at?: string
+          date?: string
+          downloads?: number | null
+          id?: string
+          rating_average?: number | null
+          retention_rate?: number | null
+          revenue?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_analytics_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      apps: {
+        Row: {
+          app_store_url: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          downloads: number | null
+          icon_url: string | null
+          id: string
+          last_updated: string | null
+          name: string
+          package_name: string
+          play_store_url: string | null
+          rating: number | null
+          rating_count: number | null
+          size_mb: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+          version: string | null
+          website_url: string | null
+        }
+        Insert: {
+          app_store_url?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          downloads?: number | null
+          icon_url?: string | null
+          id?: string
+          last_updated?: string | null
+          name: string
+          package_name: string
+          play_store_url?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          size_mb?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+          version?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          app_store_url?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          downloads?: number | null
+          icon_url?: string | null
+          id?: string
+          last_updated?: string | null
+          name?: string
+          package_name?: string
+          play_store_url?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          size_mb?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+          version?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       keywords: {
         Row: {
+          app_id: string | null
           app_package: string
           created_at: string
           id: string
@@ -28,6 +151,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          app_id?: string | null
           app_package: string
           created_at?: string
           id?: string
@@ -40,6 +164,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          app_id?: string | null
           app_package?: string
           created_at?: string
           id?: string
@@ -51,29 +176,127 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "keywords_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          company: string | null
           created_at: string
           display_name: string | null
+          email: string | null
+          email_verified: boolean | null
+          first_name: string | null
           id: string
+          language: string | null
+          last_login_at: string | null
+          last_name: string | null
+          onboarding_completed: boolean | null
+          phone: string | null
+          subscription_expires_at: string | null
+          subscription_plan: string | null
+          timezone: string | null
           updated_at: string
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          company?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_verified?: boolean | null
+          first_name?: string | null
           id: string
+          language?: string | null
+          last_login_at?: string | null
+          last_name?: string | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan?: string | null
+          timezone?: string | null
           updated_at?: string
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          company?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_verified?: boolean | null
+          first_name?: string | null
           id?: string
+          language?: string | null
+          last_login_at?: string | null
+          last_name?: string | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan?: string | null
+          timezone?: string | null
           updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          auto_refresh_interval: number | null
+          created_at: string
+          data_retention_days: number | null
+          default_language: string | null
+          default_region: string | null
+          email_notifications: boolean | null
+          id: string
+          notifications_enabled: boolean | null
+          push_notifications: boolean | null
+          theme: string | null
+          updated_at: string
+          user_id: string
+          weekly_reports: boolean | null
+        }
+        Insert: {
+          auto_refresh_interval?: number | null
+          created_at?: string
+          data_retention_days?: number | null
+          default_language?: string | null
+          default_region?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notifications_enabled?: boolean | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          updated_at?: string
+          user_id: string
+          weekly_reports?: boolean | null
+        }
+        Update: {
+          auto_refresh_interval?: number | null
+          created_at?: string
+          data_retention_days?: number | null
+          default_language?: string | null
+          default_region?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notifications_enabled?: boolean | null
+          push_notifications?: boolean | null
+          theme?: string | null
+          updated_at?: string
+          user_id?: string
+          weekly_reports?: boolean | null
         }
         Relationships: []
       }
