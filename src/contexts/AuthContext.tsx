@@ -68,13 +68,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: "destructive",
       });
     } else {
-      // If signup successful and username provided, create profile
-      if (data.user && username) {
+      // Always create profile for new users with email
+      if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
             id: data.user.id,
-            display_name: username,
+            email: email,
+            display_name: username || null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
